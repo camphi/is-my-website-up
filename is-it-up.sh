@@ -24,9 +24,11 @@ SCRIPT=$(readlink -f "$0")
 SCRIPTPATH=$(dirname "$SCRIPT")
 
 VV=$(curl -s $1)
+VI=$(curl -s -I $1 | grep 'HTTP' | awk '{ print $2 }')
+
 if [[ ! -e "$SCRIPTPATH/is-it-up" ]]
 then
-  if [[ "$VV" =~ ^\<\?php ]]
+  if [[ "$VV" =~ ^\<\?php ]] || [[ "$VI" != "200" ]]
   then
     echo "bad"
   else
