@@ -8,11 +8,10 @@ fi
 
 if [[ -z "$2" ]]
 then
-  echo "missing pushbullet Access-token";
-  exit 1;
+  echo "missing pushbullet Access-token... not sending...";
 fi
 
-if [[ -z "$3" ]]
+if [[ ! -z "$1" ]] && [[ -z "$3" ]]
 then
   echo "missing pushbullet device identification... sending to all...";
 fi
@@ -26,18 +25,18 @@ SCRIPTPATH=$(dirname "$SCRIPT")
 VV=$(curl -s -L $1)
 VI=$(curl -s -L -I $1 | grep 'HTTP' | awk '{ print $2 }')
 
-if [[ ! -e "$SCRIPTPATH/is-it-up" ]]
+if [[ "$VV" =~ ^\<\?php ]] || [[ "$VI" != "200" ]]
 then
-  if [[ "$VV" =~ ^\<\?php ]] || [[ "$VI" != "200" ]]
+  echo "bad"
+else
+  echo "good"
+  if [[ ! -z "$2" ]]
   then
-    echo "bad"
-  else
-    echo "good"
-    $(touch $SCRIPTPATH/is-it-up)
     curl --header "Access-Token: $2" \
      --header 'Content-Type: application/json' \
-     --data-binary "{\"device_iden\":\"$3\",\"body\":\"my website is up\",\"title\":\"$1\",\"type\":\"note\"}" \
+     --data-binary "{\"device_iden\":\"$3\",\"body\":\"$1 is UP\",\"title\":\"Is it UP?\",\"type\":\"note\"}" \
      --request POST \
      https://api.pushbullet.com/v2/pushes
   fi
 fi
+
