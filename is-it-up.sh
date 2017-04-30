@@ -23,8 +23,8 @@ SCRIPT=$(readlink -f "$0")
 # Absolute path this script is in, thus /home/user/bin
 SCRIPTPATH=$(dirname "$SCRIPT")
 
-VV=$(curl -s $1)
-VI=$(curl -s -I $1 | grep 'HTTP' | awk '{ print $2 }')
+VV=$(curl -s -L $1)
+VI=$(curl -s -L -I $1 | grep 'HTTP' | awk '{ print $2 }')
 
 if [[ ! -e "$SCRIPTPATH/is-it-up" ]]
 then
