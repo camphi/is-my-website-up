@@ -30,7 +30,7 @@ while IFS='' read -r line || [[ -n "$line" ]]; do
   fi
   ST=$(echo $line | awk '{ print $2 }')
   LS=$(curl -s -L $WS)
-  LH=$(curl -s -L -I $WS | grep 'HTTP' | awk '{ print $2 }')
+  LH=$(curl -s -L -I $WS | grep 'HTTP' | awk '{ print $2 }' | tail -1)
   
   if [[ "$LS" =~ ^[\ \n]*\<\?php ]] || [[ "$LH" != "200" ]]
   then
@@ -39,7 +39,7 @@ while IFS='' read -r line || [[ -n "$line" ]]; do
     SS="UP"
   fi
   
-  if [[ -z $ST ]] || [[ ! "$SS" = "$ST" ]]
+  if [[ -z $ST ]] || [[ "$SS" != "$ST" ]]
   then
     # change the status in the file
     sed -e 's_^'"$WS"'.*_'"$WS $SS"'_' -i "$SCRIPTPATH""/are-they-up.txt"
