@@ -14,3 +14,4 @@ Use a cronjob to call this script every minute to know if a website status is ch
 TODO
 - What to do with unresponding URL ?
 - Send to pushbullet only once per checkup
+- Accept cookies to prevent infinit redirects
