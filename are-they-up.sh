@@ -21,17 +21,19 @@ then
 fi
 
 while IFS='' read -r line || [[ -n "$line" ]]; do
+  # get data to validate
   WS=$(echo $line | awk '{ print $1 }')
   if [[ -z "$WS" || ! "$WS" =~ ^(https?:\/\/)?([0-9a-z\.-]+)\.([a-z\.]{2,6})([\/0-9a-zA-Z\+\% \.-]*)*\/?$ ]]
   then
     # echo "$WS is not a website!";
-    sed -e 's_^'"$WS"'.*_'"$WS ERROR"'_' -i "$SCRIPTPATH""/are-they-up.txt"
+    sed -e 's_^'"$line"'_'"$WS ERROR"'_' -i "$SCRIPTPATH""/are-they-up.txt"
     break;
   fi
   ST=$(echo $line | awk '{ print $2 }')
   LS=$(curl -s -L $WS)
   LH=$(curl -s -L -I $WS | grep 'HTTP' | awk '{ print $2 }' | tail -1)
   
+  # validate if the website is UP or DOWN
   if [[ "$LS" =~ ^[\ \n]*\<\?php ]] || [[ "$LH" != "200" ]]
   then
     SS="DOWN"
@@ -39,10 +41,11 @@ while IFS='' read -r line || [[ -n "$line" ]]; do
     SS="UP"
   fi
   
+  # send results
   if [[ -z $ST ]] || [[ "$SS" != "$ST" ]]
   then
     # change the status in the file
-    sed -e 's_^'"$WS"'.*_'"$WS $SS"'_' -i "$SCRIPTPATH""/are-they-up.txt"
+    sed -e 's_^'"$line"'_'"$WS $SS"'_' -i "$SCRIPTPATH""/are-they-up.txt"
     if [[ ! -z "$1" ]]
     then
       curl --header "Access-Token: $1" \
